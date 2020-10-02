@@ -7,7 +7,7 @@ from Utils.plotting.plot_utils import plot_image
 from alignment.Aligner import Aligner
 import numpy as np
 from noise_cleaning.NoiseCleaner import NoiseCleaner
-from defect_segmentation.DefectSegmenter import DefectSegmenter
+from defect_segmentation.DefectSegmenter import AutoencoderSegmenter
 
 
 def main():
@@ -23,8 +23,8 @@ def main():
     warped, warp_mask = aligner.align_images(static=inspected, moving=reference)
 
     # find defects
-    defect_segmenter = DefectSegmenter()
-    defect_mask = defect_segmenter.segment_defects(inspected, warped, warp_mask)
+    segmenter = AutoencoderSegmenter()
+    defect_mask = segmenter.segment_defects(inspected, warped, warp_mask)
 
     # observe results
     diff = np.zeros(inspected.shape, dtype=np.float32)

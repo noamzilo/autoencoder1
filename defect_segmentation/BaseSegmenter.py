@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
+from overrides import EnforceOverrides
 
 
-class BaseSegmenter(ABC):
-    def init(self):
+class BaseSegmenter(EnforceOverrides):
+    def __init__(self):
         pass
 
     @abstractmethod
-    def detect(self, inspected, warped, warp_mask):
+    def segment_defects(self, inspected, warped, warp_mask):
         raise NotImplementedError
