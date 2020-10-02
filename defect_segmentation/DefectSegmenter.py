@@ -8,4 +8,4 @@ class AutoencoderSegmenter(BaseSegmenter):
 
     @overrides
     def segment_defects(self, inspected, warped, warp_mask):
-        pass
+        return ~warp_mask

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from overrides import EnforceOverrides
 
 
-class BaseSegmenter(EnforceOverrides):
+class BaseSegmenter(EnforceOverrides, ABC):
     def __init__(self):
         pass
 

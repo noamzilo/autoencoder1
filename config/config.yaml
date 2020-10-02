@@ -16,7 +16,7 @@ noise_cleaning:
 
 alignment:
   is_force_translation: True
-  subpixel_accuracy_resolution: 5
+  subpixel_accuracy_resolution: 1
 
 misc:
   is_plotting: False
