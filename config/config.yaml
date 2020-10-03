@@ -19,4 +19,4 @@ alignment:
   subpixel_accuracy_resolution: 1
 
 misc:
-  is_plotting: False
+  is_plotting: True

@@ -34,8 +34,8 @@ def _observe_results(defect_mask, inspected, reference, warp_mask, warped):
     diff[warp_mask] = (np.abs((np.float32(warped) - np.float32(inspected))))[warp_mask]
     noise_cleaner = NoiseCleaner()
     diff = noise_cleaner.clean_frame(diff, warp_mask)
-    cv2.imshow("color_result", get_color_diff_image(inspected, defect_mask * 255).astype('uint8'))
-    plt.imshow(diff.astype('uint8'), cmap='gray')
+    # cv2.imshow("color_result", get_color_diff_image(inspected, defect_mask * 255).astype('uint8'))
+    # plt.imshow(diff.astype('uint8'), cmap='gray')
     # plt.title("diff")
     # cv2.imshow("inspected", inspected.astype('uint8'))
     # cv2.imshow("reference", reference.astype('uint8'))
