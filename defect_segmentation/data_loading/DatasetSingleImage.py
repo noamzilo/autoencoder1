@@ -17,14 +17,23 @@ class DatasetSingleImage(Dataset):
 
         self._strides = strides
         self._stride_rows, self._stride_cols = self._strides[0], self._strides[1]
-        self._rows_start_range = range(0, self._rows, self._stride_rows)
-        self._cols_start_range = range(0, self._cols, self._stride_cols)
+        # self._rows_start_range = range(0, self._rows, self._stride_rows)
+        # self._cols_start_range = range(0, self._cols, self._stride_cols)
+
+        self._rows_tuples_range = \
+            [(c, min(c + self._stride_rows, self._rows)) for c in range(0, self._rows, self._stride_rows)]
+        self._cols_tuples_range = \
+            [(r, min(r + self._stride_cols, self._cols)) for r in range(0, self._cols, self._stride_cols)]
 
     def __len__(self):
-        return 1
+        return len(self._rows_tuples_range) * len(self._cols_tuples_range)
 
-    def __getitem__(self, item):
-        return self._im
+    def __getitem__(self, ind):
+        row_ind = ind // self._cols
+        col_ind = ind % self._cols
+        sum_im_x = self._rows_tuples_range[row_ind]
+        sum_im_y = self._cols_tuples_range[col_ind]
+        return self._im[sum_im_x[0]:sum_im_x[1], sum_im_y[0]:sum_im_y[1]]
 
 
 if __name__ == "__main__":
