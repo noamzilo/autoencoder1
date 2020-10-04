@@ -21,16 +21,17 @@ if __name__ == "__main__":
         shuffle = True
         num_workers = 0
         loader = DataloaderSingleImage(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
-        # loader.iterate()
         for i_batch, sample_batched in enumerate(loader):
             plt.figure()
             plt.title(f"i_batch = {i_batch}")
-            for i_sample in range(sample_batched.shape[0]):
-                ax = plt.subplot(int(np.sqrt(batch_size)), int(np.sqrt(batch_size)), i_sample + 1)
+            _, axs = plt.subplots(int(np.sqrt(batch_size)), int(np.sqrt(batch_size)))
+            for i_sample, ax in zip(range(sample_batched.shape[0]), axs.flat):
+                # ax = plt.subplot(int(np.sqrt(batch_size)), int(np.sqrt(batch_size)), i_sample + 1)
                 ax.set_title(f"Sample #{i_sample}")
                 ax.axis("off")
-                plt.imshow(sample_batched[i_sample, :, :])
-                plt.pause(0.000)
-            plt.show()
+                ax.imshow(sample_batched[i_sample, :, :])
+                plt.pause(0.001)
+
+                plt.show()
 
     main()
