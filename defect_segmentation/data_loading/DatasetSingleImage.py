@@ -21,30 +21,35 @@ class DatasetSingleImage(Dataset):
         # self._cols_start_range = range(0, self._cols, self._stride_cols)
 
         self._rows_tuples_range = \
-            [(c, min(c + self._stride_rows, self._rows)) for c in range(0, self._rows, self._stride_rows)]
+            [(c, min(c + self._sample_rows, self._rows)) for c in range(0, self._rows, self._stride_rows)]
         self._cols_tuples_range = \
-            [(r, min(r + self._stride_cols, self._cols)) for r in range(0, self._cols, self._stride_cols)]
+            [(r, min(r + self._sample_cols, self._cols)) for r in range(0, self._cols, self._stride_cols)]
+
+        self._n_strides_rows = len(self._rows_tuples_range)
+        self._n_strides_cols = len(self._cols_tuples_range)
+        self._total_strides = self._n_strides_rows * self._n_strides_cols
 
     def __len__(self):
-        return len(self._rows_tuples_range) * len(self._cols_tuples_range)
+        return self._total_strides
 
     def __getitem__(self, ind):
-        row_ind = ind // self._cols
-        col_ind = ind % self._cols
-        sum_im_x = self._rows_tuples_range[row_ind]
-        sum_im_y = self._cols_tuples_range[col_ind]
-        return self._im[sum_im_x[0]:sum_im_x[1], sum_im_y[0]:sum_im_y[1]]
+        row_ind = ind // self._n_strides_cols
+        col_ind = ind % self._n_strides_cols
+        sample_x = self._rows_tuples_range[row_ind]
+        sample_y = self._cols_tuples_range[col_ind]
+        return self._im[sample_x[0]:sample_x[1], sample_y[0]:sample_y[1]]
 
 
 if __name__ == "__main__":
     def main():
         path = ConfigProvider.config().data.defective_inspected_path1
-        sample_shape = (15, 15)
-        strides = (1, 1)
+        sample_shape = (50, 50)
+        strides = (25, 25)
         dataset = DatasetSingleImage(path, sample_shape, strides)
         for i in range(len(dataset)):
             sample = dataset[i]
-            cv2.imshow(f"sample #{i}", sample)
-            cv2.waitKey(0)
+            # cv2.imshow(f"sample #{i}", sample)
+            cv2.imshow(f"sample", sample)
+            cv2.waitKey(50)
 
     main()
