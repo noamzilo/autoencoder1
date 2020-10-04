@@ -9,3 +9,4 @@ skimage==0.0
 opencv-python~=4.4.0.44
 scikit-image~=0.17.2
 overrides~=3.1.0
+torch~=1.6.0+cu101

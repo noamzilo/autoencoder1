@@ -1,7 +1,8 @@
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from Utils.ConfigProvider import ConfigProvider
 import cv2
 import os
+from overrides import overrides
 
 
 class DatasetSingleImage(Dataset):
@@ -32,6 +33,7 @@ class DatasetSingleImage(Dataset):
     def __len__(self):
         return self._total_strides
 
+    @overrides
     def __getitem__(self, ind):
         row_ind = ind // self._n_strides_cols
         col_ind = ind % self._n_strides_cols
@@ -42,12 +44,17 @@ class DatasetSingleImage(Dataset):
         return sample
 
 
+def dataset_single_image_default():
+    path = ConfigProvider.config().data.defective_inspected_path1
+    sample_shape = (50, 50)
+    strides = (25, 25)
+    dataset = DatasetSingleImage(path, sample_shape, strides)
+    return dataset
+
+
 if __name__ == "__main__":
     def main():
-        path = ConfigProvider.config().data.defective_inspected_path1
-        sample_shape = (50, 50)
-        strides = (25, 25)
-        dataset = DatasetSingleImage(path, sample_shape, strides)
+        dataset = dataset_single_image_default()
         for i in range(len(dataset)):
             sample = dataset[i]
             # cv2.imshow(f"sample #{i}", sample)
