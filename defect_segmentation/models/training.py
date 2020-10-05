@@ -1,20 +1,36 @@
 import torch
 from defect_segmentation.data_loading.DatasetSingleImage import dataset_single_image_default
 import numpy as np
+from defect_segmentation.models.BasicAutoencoder import BasicAutoencoder
+from torch import optim
+from torch import nn
+from torch.utils.data import DataLoader
 
 
 def train_autoencoder():
     seed = 42
     np.random.seed(seed)
-    dataset = dataset_single_image_default()
+    batch_size = 4
+    num_workers = 0
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    bae = BasicAutoencoder(10 * 10).to(device)
+
+    optimizer = optim.Adam(bae.parameters(), lr=1e-3)
+    criterion = nn.MSELoss()
+
+    dataset = dataset_single_image_default()
     train_size = int(len(dataset) * 0.7)
     test_size = len(dataset) - train_size
-    train, test = \
+    train_dataset, test_dataset = \
         torch.utils.data.random_split(
             dataset,
             [train_size, test_size],
             generator=torch.Generator().manual_seed(seed))
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
+
     pass
 
 

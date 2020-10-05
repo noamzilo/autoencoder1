@@ -46,7 +46,7 @@ class DatasetSingleImage(Dataset):
 
 def dataset_single_image_default():
     path = ConfigProvider.config().data.defective_inspected_path1
-    sample_shape = (50, 50)
+    sample_shape = (10, 10)
     strides = (25, 25)
     dataset = DatasetSingleImage(path, sample_shape, strides)
     return dataset

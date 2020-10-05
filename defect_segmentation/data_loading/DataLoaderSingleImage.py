@@ -20,5 +20,6 @@ if __name__ == "__main__":
                 ax.axis("off")
                 ax.imshow(sample_batched[i_sample, :, :])
                 plt.pause(0.001)
+            plt.close(fig)
 
     main()
