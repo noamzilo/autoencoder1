@@ -31,7 +31,36 @@ def train_autoencoder():
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
 
-    pass
+    epochs = 5
+    for epoch in range(epochs):
+        loss = 0
+        for batch_features in train_loader:
+            batch_features = batch_features.view(-1, 100).to(device)
+
+            # reset the gradients back to zero
+            # PyTorch accumulates gradients on subsequent backward passes
+            optimizer.zero_grad()
+
+            # compute reconstructions
+            outputs = bae(batch_features)
+
+            # compute training reconstruction loss
+            train_loss = criterion(outputs, batch_features)
+
+            # compute accumulated gradients
+            train_loss.backward()
+
+            # perform parameter update based on current gradients
+            optimizer.step()
+
+            # add the mini-batch training loss to epoch loss
+            loss += train_loss.item()
+
+        # compute the epoch training loss
+        loss = loss / len(train_loader)
+
+        # display the epoch training loss
+        print("epoch : {}/{}, loss = {:.6f}".format(epoch + 1, epochs, loss))
 
 
 if __name__ == "__main__":
