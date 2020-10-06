@@ -31,11 +31,11 @@ def train_autoencoder():
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
 
-    epochs = 5
+    epochs = 100
     for epoch in range(epochs):
         loss = 0
         for batch_features in train_loader:
-            batch_features = batch_features.view(-1, 100).to(device)
+            batch_features = batch_features.float().view(-1, 100).to(device)
 
             # reset the gradients back to zero
             # PyTorch accumulates gradients on subsequent backward passes
