@@ -66,6 +66,7 @@ def train_autoencoder():
         bae.eval()
         test_loss = 0
         batch_features_test_ = []
+        outputs = []
         for batch_features_test_ in test_loader:
             batch_features_test = batch_features_test_.float().view(-1, np.prod(sample_shape)).to(device)
 
@@ -80,15 +81,19 @@ def train_autoencoder():
         print(f"test : {epoch + 1}/{epochs}, loss = {test_loss:.6f}")
 
         if epoch % 50 == 0:
-            for i_sample, sample in enumerate(batch_features_test_):
-                fig, axs = plt.subplots(int(np.sqrt(batch_features_test_.shape[0])), batch_features_test_.shape[0] // int(np.sqrt(batch_features_test_.shape[0])))
-                fig.suptitle(f"i_batch = {i_sample}")
-                for i_sample, ax in zip(range(batch_features_test_.shape[0]), axs.flat):
-                    ax.set_title(f"Sample #{i_sample}")
+            num_samples = batch_features_test_.shape[0]
+            fig, axs = plt.subplots(2, num_samples)
+            for i_sample in range(num_samples):
+                for i in range(2):
+                    ax = axs[i, i_sample]
+                    if i == 0:
+                        ax.imshow(batch_features_test_[i_sample, :, :])
+                    else:
+                        ax.imshow((outputs.view(4, 10, 10, 3)/255).cpu().detach().numpy()[i_sample, :, :])
                     ax.axis("off")
-                    ax.imshow(batch_features_test_[i_sample, :, :])
+                    ax.set_title(f"Sample #{i_sample}")
                     plt.pause(0.001)
-                plt.close(fig)
+            plt.close(fig)
 
     plt.figure()
     plt.plot(np.arange(epochs), train_losses, color='r', label='train loss')
