@@ -6,6 +6,8 @@ from torch import optim
 from torch import nn
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
+from Utils.ConfigProvider import ConfigProvider
+from defect_segmentation.data_loading.DatasetSingleImage import DatasetSingleImage
 
 
 def train_autoencoder():
@@ -16,13 +18,18 @@ def train_autoencoder():
     batch_size = 4
     num_workers = 0
 
+    sample_shape = (10, 10)
+    strides = (25, 25)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bae = BasicAutoencoder(10 * 10).to(device)
 
     optimizer = optim.Adam(bae.parameters(), lr=1e-3)
     criterion = nn.MSELoss()
 
-    dataset = dataset_single_image_default()
+    path = ConfigProvider.config().data.defective_inspected_path1
+    dataset = DatasetSingleImage(path, sample_shape, strides)
+
     train_size = int(len(dataset) * 0.7)
     test_size = len(dataset) - train_size
     train_dataset, test_dataset = \
@@ -40,8 +47,8 @@ def train_autoencoder():
     for epoch in range(epochs):
         bae.train()
         train_loss = 0
-        for batch_features_train in train_loader:
-            batch_features_train = batch_features_train.float().view(-1, 100).to(device)
+        for batch_features_train_ in train_loader:
+            batch_features_train = batch_features_train_.float().view(-1, np.prod(sample_shape)).to(device)
 
             optimizer.zero_grad()
 
@@ -58,8 +65,9 @@ def train_autoencoder():
 
         bae.eval()
         test_loss = 0
-        for batch_features_test in test_loader:
-            batch_features_test = batch_features_test.float().view(-1, 100).to(device)
+        batch_features_test_ = []
+        for batch_features_test_ in test_loader:
+            batch_features_test = batch_features_test_.float().view(-1, np.prod(sample_shape)).to(device)
 
             outputs = bae(batch_features_test)
             test_loss = criterion(outputs, batch_features_test)
@@ -71,11 +79,23 @@ def train_autoencoder():
         test_losses[epoch] = test_loss
         print(f"test : {epoch + 1}/{epochs}, loss = {test_loss:.6f}")
 
+        if epoch % 50 == 0:
+            for i_sample, sample in enumerate(batch_features_test_):
+                fig, axs = plt.subplots(int(np.sqrt(batch_features_test_.shape[0])), batch_features_test_.shape[0] // int(np.sqrt(batch_features_test_.shape[0])))
+                fig.suptitle(f"i_batch = {i_sample}")
+                for i_sample, ax in zip(range(batch_features_test_.shape[0]), axs.flat):
+                    ax.set_title(f"Sample #{i_sample}")
+                    ax.axis("off")
+                    ax.imshow(batch_features_test_[i_sample, :, :])
+                    plt.pause(0.001)
+                plt.close(fig)
+
     plt.figure()
     plt.plot(np.arange(epochs), train_losses, color='r', label='train loss')
     plt.plot(np.arange(epochs), test_losses, color='b', label='test loss')
     plt.legend(loc='upper right')
     plt.show()
+
 
 
 if __name__ == "__main__":
