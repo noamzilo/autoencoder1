@@ -21,6 +21,8 @@ def train_autoencoder():
     sample_shape = (10, 10)
     strides = (25, 25)
 
+    is_plotting = False
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bae = BasicAutoencoder(10 * 10).to(device)
 
@@ -80,7 +82,8 @@ def train_autoencoder():
         test_losses[epoch] = test_loss
         print(f"test : {epoch + 1}/{epochs}, loss = {test_loss:.6f}")
 
-        if epoch % 50 == 0:
+
+        if is_plotting and epoch % 50 == 0:
             num_samples = batch_features_test_.shape[0]
             fig, axs = plt.subplots(2, num_samples)
             for i_sample in range(num_samples):
