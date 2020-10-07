@@ -5,9 +5,12 @@ from defect_segmentation.models.BasicAutoencoder import BasicAutoencoder
 from torch import optim
 from torch import nn
 from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
 
 
 def train_autoencoder():
+    print(f"running with device: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+
     seed = 42
     np.random.seed(seed)
     batch_size = 4
@@ -31,36 +34,48 @@ def train_autoencoder():
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
 
-    epochs = 1000
+    epochs = 300
+    train_losses = np.zeros((epochs,))
+    test_losses = np.zeros((epochs,))
     for epoch in range(epochs):
-        loss = 0
-        for batch_features in train_loader:
-            batch_features = batch_features.float().view(-1, 100).to(device)
+        bae.train()
+        train_loss = 0
+        for batch_features_train in train_loader:
+            batch_features_train = batch_features_train.float().view(-1, 100).to(device)
 
-            # reset the gradients back to zero
-            # PyTorch accumulates gradients on subsequent backward passes
             optimizer.zero_grad()
 
-            # compute reconstructions
-            outputs = bae(batch_features)
+            outputs = bae(batch_features_train)
+            train_loss = criterion(outputs, batch_features_train)
 
-            # compute training reconstruction loss
-            train_loss = criterion(outputs, batch_features)
-
-            # compute accumulated gradients
             train_loss.backward()
-
-            # perform parameter update based on current gradients
             optimizer.step()
+            train_loss += train_loss.item()
 
-            # add the mini-batch training loss to epoch loss
-            loss += train_loss.item()
+        train_loss = train_loss / len(train_loader)
+        train_losses[epoch] = train_loss
+        print(f"train : {epoch + 1}/{epochs}, loss = {train_loss:.6f}")
 
-        # compute the epoch training loss
-        loss = loss / len(train_loader)
+        bae.eval()
+        test_loss = 0
+        for batch_features_test in test_loader:
+            batch_features_test = batch_features_test.float().view(-1, 100).to(device)
 
-        # display the epoch training loss
-        print("epoch : {}/{}, loss = {:.6f}".format(epoch + 1, epochs, loss))
+            outputs = bae(batch_features_test)
+            test_loss = criterion(outputs, batch_features_test)
+
+            test_loss.backward()
+            test_loss += test_loss.item()
+
+        test_loss = test_loss / len(test_loader)
+        test_losses[epoch] = test_loss
+        print(f"test : {epoch + 1}/{epochs}, loss = {test_loss:.6f}")
+
+    plt.figure()
+    plt.plot(np.arange(epochs), train_losses, color='r', label='train loss')
+    plt.plot(np.arange(epochs), test_losses, color='b', label='test loss')
+    plt.legend(loc='upper right')
+    plt.show()
 
 
 if __name__ == "__main__":
