@@ -9,7 +9,7 @@ class DatasetSingleImage(Dataset):
     def __init__(self, image_path: str, sample_shape: tuple, strides: tuple):
         self._path = image_path
         assert os.path.isfile(self._path)
-        self._im = cv2.imread(self._path)
+        self._im = cv2.imread(self._path, 0)
         self._shape = self._im.shape
         self._rows, self._cols = self._shape[0], self._shape[1]
 
@@ -46,8 +46,8 @@ class DatasetSingleImage(Dataset):
 
 def dataset_single_image_default():
     path = ConfigProvider.config().data.defective_inspected_path1
-    sample_shape = (10, 10)
-    strides = (25, 25)
+    sample_shape = (11, 11)
+    strides = (10, 10)
     dataset = DatasetSingleImage(path, sample_shape, strides)
     return dataset
 

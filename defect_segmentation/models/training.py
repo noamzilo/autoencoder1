@@ -43,7 +43,7 @@ def train_autoencoder():
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
 
-    epochs = 300
+    epochs = 25
     train_losses = np.zeros((epochs,))
     test_losses = np.zeros((epochs,))
     for epoch in range(epochs):
