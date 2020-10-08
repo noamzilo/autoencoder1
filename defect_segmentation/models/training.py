@@ -18,13 +18,13 @@ def train_autoencoder():
     batch_size = 4
     num_workers = 0
 
-    sample_shape = (10, 10)
+    sample_shape = (11, 11)
     strides = (25, 25)
 
     is_plotting = False
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    bae = BasicAutoencoder(10 * 10).to(device)
+    bae = BasicAutoencoder(np.prod(sample_shape)).to(device)
 
     optimizer = optim.Adam(bae.parameters(), lr=1e-3)
     criterion = nn.MSELoss()
@@ -43,7 +43,7 @@ def train_autoencoder():
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, )
 
-    epochs = 25
+    epochs = 200
     train_losses = np.zeros((epochs,))
     test_losses = np.zeros((epochs,))
     for epoch in range(epochs):

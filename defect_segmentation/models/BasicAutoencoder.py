@@ -1,9 +1,11 @@
 import torch
 from torch import nn
+from typing import Union
+import numpy as np
 
 
 class BasicAutoencoder(nn.Module):
-    def __init__(self, input_shape: int):
+    def __init__(self, input_shape: Union[int, np.array]):
         super().__init__()
         self.encoder_hidden_layer = nn.Linear(
             in_features=input_shape, out_features=50
